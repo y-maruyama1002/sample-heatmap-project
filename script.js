@@ -1,23 +1,17 @@
 // "use strict";
-/*
-Copyright (c) 2010, Patrick Wied. All rights reserved.
-Code licensed under the BSD License:
-http://patrick-wied.at/static/license.txt
-*/
-let heatmapApp = (function () {
+
+const heatmapApp = (function () {
   // let definition
   // canvas: the canvas element
   // ctx: the canvas 2d context
   // width: the heatmap width for border calculations
   // height: the heatmap height for border calculations
-  // invoke: the app doesn't react on the mouse events unless the invoke let is set to true
   let canvas,
     ctx,
     width,
     height,
-    radius1 = 20,
-    radius2 = 40,
-    invoke = false,
+    radius1 = 1,
+    radius2 = 10,
     // function for coloring the heatmap
     colorize = function (x, y, x2) {
       // initial check if x and y is outside the app
@@ -69,48 +63,29 @@ let heatmapApp = (function () {
       image.data = imageData;
       ctx.putImageData(image, x, y);
     },
-    // this handler is listening to the mouse movement of the user
-    mouseMoveHandler = function (ev) {
-      // if the invoke variable is set to true -> do the alphamap manipulation
-      if (invoke) {
-        // at first we have to get the x and y values of the user's mouse position
-        let x, y;
-        if (ev.layerX) {
-          // Firefox
-          x = ev.layerX;
-          y = ev.layerY;
-        } else if (ev.offsetX) {
-          // Opera
-          x = ev.offsetX;
-          y = ev.offsetY;
-        }
-        if (typeof x == "undefined") return;
+    // this handler is listening to the click event of the user
+    clickEvent = function (ev) {
+      // get the x and y values of the user's click position
+      let x, y;
+      x = ev.pageX;
+      y = ev.pageY;
+      if (typeof x === undefined) return;
 
-        // storing the variables because they will be often used
-        let r1 = radius1;
-        let r2 = radius2;
+      // storing the variables because they will be often used
+      let r1 = radius1;
+      let r2 = radius2;
 
-        //console.log("x: "+x+"; y:" +y);
-        // create a radial gradient with the defined parameters. we want to draw an alphamap
-        let rgr = ctx.createRadialGradient(x, y, r1, x, y, r2);
-        // the center of the radial gradient has .1 alpha value
-        rgr.addColorStop(0, "rgba(0,0,0,0.1)");
-        // and it fades out to 0
-        rgr.addColorStop(1, "rgba(0,0,0,0)");
-        // drawing the gradient
-        ctx.fillStyle = rgr;
-        ctx.fillRect(x - r2, y - r2, 2 * r2, 2 * r2);
-        // negate the invoke variable
-        // next execution of the logic is when the activate method activates the invoke let again
-        invoke = !invoke;
-        // at least colorize the area
-        colorize(x - r2, y - r2, 2 * r2);
-      }
-    },
-    // we don't want to capture all events because this would result in low performance
-    // -> a function for activating the heatmap logic which will be called in a specified interval
-    activate = function () {
-      invoke = !invoke;
+      // create a radial gradient with the defined parameters. we want to draw an alphamap
+      let rgr = ctx.createRadialGradient(x, y, r1, x, y, r2);
+      // the center of the radial gradient has .1 alpha value
+      rgr.addColorStop(0, "rgba(0,0,0,0.1)");
+      // and it fades out to 0
+      rgr.addColorStop(1, "rgba(0,0,0,0)");
+      // drawing the gradient
+      ctx.fillStyle = rgr;
+      ctx.fillRect(x - r2, y - r2, 2 * r2, 2 * r2);
+      // at least colorize the area
+      colorize(x - r2, y - r2, 2 * r2);
     };
 
   return {
@@ -119,46 +94,41 @@ let heatmapApp = (function () {
       canvas = document.getElementById(c);
       canvas.width = wt;
       canvas.height = ht;
-      canvas.style.border = "2px solid black";
       ctx = canvas.getContext("2d");
       width = wt;
       height = ht;
       canvas["onclick"] = function (ev) {
-        mouseMoveHandler(ev);
+        clickEvent(ev);
       };
 
       // iPhone / iPad support
-      canvas["ontouchmove"] = function (ev) {
-        let touch = ev.touches[0],
-          // simulating a mousemove event
-          simulatedEvent = document.createEvent("MouseEvent");
-        simulatedEvent.initMouseEvent(
-          "mousemove",
-          true,
-          true,
-          window,
-          1,
-          touch.screenX,
-          touch.screenY,
-          touch.clientX,
-          touch.clientY,
-          false,
-          false,
-          false,
-          false,
-          0,
-          null
-        );
-        // dispatching the simulated event
-        touch.target.dispatchEvent(simulatedEvent);
-        // we don't want to have the default iphone scrolling behaviour ontouchmove
-        ev.preventDefault();
-      };
-
-      // call the activate function in an interval of 50ms
-      (function (fn) {
-        setInterval(fn, 50);
-      })(activate);
+      // canvas["ontouchmove"] = function (ev) {
+      //   let touch = ev.touches[0],
+      //     // simulating a mousemove event
+      //     simulatedEvent = document.createEvent("MouseEvent");
+      //    TODO: initMouseEvent is deprecated
+      //   simulatedEvent.initMouseEvent(
+      //     "click", //	設定するイベント
+      //     true, // イベントがバブリング出来るか否か
+      //     true, // イベントのデフォルトの動作をキャンセルさせることが出来るか否か
+      //     window, // イベントのAbstractViewを指定します。
+      //     1, //	イベントのマウスのクリック回数です。
+      //     touch.screenX, // イベントのスクリーンのx座標です。
+      //     touch.screenY, // イベントのスクリーンのy座標です。
+      //     touch.clientX, //	イベントのクライアントのx座標です。
+      //     touch.clientY, // イベントのクライアントのy座標です。
+      //     false, //	イベント中にCtrlキーが押されていたか否かを指定します。
+      //     false, // イベント中にAltキーが押されていたか否かを指定します。
+      //     false, // イベント中にShiftキーが押されていたか否かを指定します。
+      //     false, //	イベント中にMetaキーが押されていたか否かを指定します。
+      //     0, //	イベントのマウスのevent.buttonです。
+      //     null // イベントに関連するイベントターゲットです。
+      //   );
+      //   // dispatching the simulated event
+      //   touch.target.dispatchEvent(simulatedEvent);
+      //   // we don't want to have the default iphone scrolling behaviour ontouchmove
+      //   ev.preventDefault();
+      // };
     },
     // if you like to process the image data e.g onbeforeunload
     // just call the getData method -> returns imagedata as a dataurl string
@@ -167,6 +137,7 @@ let heatmapApp = (function () {
     },
   };
 })();
+
 window["onload"] = function () {
   //call the initialization
   heatmapApp.initialize("c", 1000, 1000);
