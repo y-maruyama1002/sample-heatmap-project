@@ -1,4 +1,4 @@
-// "use strict";
+"use strict";
 
 const heatmapApp = (function () {
   // let definition
@@ -11,7 +11,7 @@ const heatmapApp = (function () {
     width,
     height,
     radius1 = 1,
-    radius2 = 10,
+    radius2 = 5,
     // function for coloring the heatmap
     colorize = function (x, y, x2) {
       // initial check if x and y is outside the app
@@ -60,7 +60,6 @@ const heatmapApp = (function () {
       }
       // the rgb data manipulation didn't affect the ImageData object(defined on the top)
       // after the manipulation process we have to set the manipulated data to the ImageData object
-      image.data = imageData;
       ctx.putImageData(image, x, y);
     },
     // this handler is listening to the click event of the user
@@ -69,6 +68,7 @@ const heatmapApp = (function () {
       let x, y;
       x = ev.pageX;
       y = ev.pageY;
+      console.log(x, y);
       if (typeof x === undefined) return;
 
       // storing the variables because they will be often used
@@ -100,35 +100,6 @@ const heatmapApp = (function () {
       canvas["onclick"] = function (ev) {
         clickEvent(ev);
       };
-
-      // iPhone / iPad support
-      // canvas["ontouchmove"] = function (ev) {
-      //   let touch = ev.touches[0],
-      //     // simulating a mousemove event
-      //     simulatedEvent = document.createEvent("MouseEvent");
-      //    TODO: initMouseEvent is deprecated
-      //   simulatedEvent.initMouseEvent(
-      //     "click", //	設定するイベント
-      //     true, // イベントがバブリング出来るか否か
-      //     true, // イベントのデフォルトの動作をキャンセルさせることが出来るか否か
-      //     window, // イベントのAbstractViewを指定します。
-      //     1, //	イベントのマウスのクリック回数です。
-      //     touch.screenX, // イベントのスクリーンのx座標です。
-      //     touch.screenY, // イベントのスクリーンのy座標です。
-      //     touch.clientX, //	イベントのクライアントのx座標です。
-      //     touch.clientY, // イベントのクライアントのy座標です。
-      //     false, //	イベント中にCtrlキーが押されていたか否かを指定します。
-      //     false, // イベント中にAltキーが押されていたか否かを指定します。
-      //     false, // イベント中にShiftキーが押されていたか否かを指定します。
-      //     false, //	イベント中にMetaキーが押されていたか否かを指定します。
-      //     0, //	イベントのマウスのevent.buttonです。
-      //     null // イベントに関連するイベントターゲットです。
-      //   );
-      //   // dispatching the simulated event
-      //   touch.target.dispatchEvent(simulatedEvent);
-      //   // we don't want to have the default iphone scrolling behaviour ontouchmove
-      //   ev.preventDefault();
-      // };
     },
     // if you like to process the image data e.g onbeforeunload
     // just call the getData method -> returns imagedata as a dataurl string
@@ -139,6 +110,9 @@ const heatmapApp = (function () {
 })();
 
 window["onload"] = function () {
+  const heatMap = document.getElementById("heatmap");
+  let w = heatMap.clientWidth;
+  let h = heatMap.clientHeight;
   //call the initialization
-  heatmapApp.initialize("c", 1000, 1000);
+  heatmapApp.initialize("c", w, h);
 };
