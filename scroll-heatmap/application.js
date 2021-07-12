@@ -1,7 +1,7 @@
 "use strict";
 
 
-// this is datas of viewheight + scroll 
+// this is datas of viewheight + scroll it means how many below did enduser achieved.
 const scrollCoordinates = [1000, 2000, 3000, 500, 2500, 1500, 1000, 2000, 3000, 500, 2500, 1500, 1000, 2000, 3000, 500, 2500, 1500, 1000, 2000, 3000, 500, 2500, 1500, ];
 
 const canvas = document.getElementById("c");

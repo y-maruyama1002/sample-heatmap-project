@@ -35,10 +35,9 @@ const attentionDatas = [
     }
 ];
 
-const createAttentionHeatMap = function() {
-  for(let i = 0; i < attentionDatas.length; ++i) {
-    for(let o = 0; o < attentionDatas[i].passTime; ++o) {
-      let attentionData = attentionDatas[i];
+const createAttentionHeatMap = function(attentionDatas) {
+  for(let attentionData of attentionDatas) {
+    for(let i = 0; i < attentionData.passTime; ++i) {
       let gradient = ctx.createLinearGradient(500, attentionData.topPosition, 500, attentionData.bottomPosition);
       gradient.addColorStop(0.0, 'rgba(0, 0, 0, 0.2)');
       ctx.beginPath();
@@ -47,10 +46,11 @@ const createAttentionHeatMap = function() {
       ctx.fill();
       colorize(attentionData.topPosition, attentionData.bottomPosition);
     }
-  } 
+  }
 }
+// 配列の中身の数×見た時間　だけ色付けを行う
 
-createAttentionHeatMap();
+createAttentionHeatMap(attentionDatas);
 
 function colorize(topPosition, bottomPosition) {
   let image = ctx.getImageData(0, topPosition, wt, bottomPosition),
